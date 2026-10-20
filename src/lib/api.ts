@@ -1,6 +1,11 @@
 import { ApiErrorDetail, ApiErrorResponse, ApiResponse } from '@/shared';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+const getBaseUrl = () => {
+  const rawBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1').replace(/\/+$/, '');
+  return rawBase.endsWith('/api/v1') ? rawBase : `${rawBase}/api/v1`;
+};
+
+const API_BASE_URL = getBaseUrl();
 
 export class ApiClientError extends Error {
   code: string;
@@ -44,7 +49,8 @@ export async function apiRequest<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const url = `${API_BASE_URL}${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${API_BASE_URL}${cleanEndpoint}`;
 
   try {
     const response = await fetch(url, {
