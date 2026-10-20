@@ -1,8 +1,10 @@
 import { ApiErrorDetail, ApiErrorResponse, ApiResponse } from '@/shared';
 
 const getBaseUrl = () => {
-  const rawBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1').replace(/\/+$/, '');
-  return rawBase.endsWith('/api/v1') ? rawBase : `${rawBase}/api/v1`;
+  let raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1').trim().replace(/\/+$/, '');
+  // Collapse any duplicate /api/v1 occurrences (e.g. /api/v1/api/v1 -> /api/v1)
+  raw = raw.replace(/(\/api\/v1)+$/, '/api/v1');
+  return raw.endsWith('/api/v1') ? raw : `${raw}/api/v1`;
 };
 
 const API_BASE_URL = getBaseUrl();
